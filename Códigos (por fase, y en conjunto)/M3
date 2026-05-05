@@ -2,27 +2,31 @@ import event, cyberpi, mbuild, mbot2, time
  
 vel = 20
 fase_programa = 0 
-# Fase 0: Siguiendo linea negra hasta llegar a la azul
-# Fase 1: Girar y seguir linea azul
-# Fase 2: Apagar vela y llegar a la linea amarilla
+estado_giro = 0 # Para ver si ya ha girado o no en las partes de girar 90° para subir a una linea
+i_vb = 0 # Contador para vela blanca
 
-# Declaracion estados de lineas de color
-estado_negro_all = mbuild.quad_rgb_sensor.get_black_sta("all", 1) 
-estado_verde_all = mbuild.quad_rgb_sensor.get_green_sta("all", 1)
-estado_rojo_all = mbuild.quad_rgb_sensor.get_red_sta("all", 1)
-estado_azul_all = mbuild.quad_rgb_sensor.get_blue_sta("all", 1)
-estado_cyan_all = mbuild.quad_rgb_sensor.get_cyan_sta("all", 1)
+# En esta calibracion (calibracion al color de arena): NEGRO -> Azul | AZUL -> Cyan | Amarillo = Amarillo | Rojo = Morado | Blanco = Blanco
+
+# Fase 0: Siguiendo linea negra hasta llegar a la azul
+# Fase 1: Girar, seguir linea azul y apagar la vela (si esta encendida)
+# Fase 2: Linea azul -> linea amarilla
+# Fase 3: Apagar vela linea amarilla (si esta encendida)
+# Fase 4: Linea amarilla -> Linea roja
+# Fase 5: Apagar vela linea roja (si esta encendida)
+# Fase 6: Linea roja -> Circulo blanco
+
+estado_negro_all = mbuild.quad_rgb_sensor.get_blue_sta("all", 1)
+estado_rojo_all = mbuild.quad_rgb_sensor.get_purple_sta("all", 1)
+estado_azul_all = mbuild.quad_rgb_sensor.get_cyan_sta("all", 1)
 estado_amarillo_all = mbuild.quad_rgb_sensor.get_yellow_sta("all", 1)
 estado_blanco_all = mbuild.quad_rgb_sensor.get_white_sta("all", 1)  
     
 # Deteccion de color sensores interiores
-estado_negro_interior = mbuild.quad_rgb_sensor.get_black_sta("middle", 1) 
-estado_verde_interior = mbuild.quad_rgb_sensor.get_green_sta("middle", 1)
-estado_rojo_interior = mbuild.quad_rgb_sensor.get_red_sta("middle", 1)
-estado_azul_interior = mbuild.quad_rgb_sensor.get_blue_sta("middle", 1)
-estado_cyan_interior = mbuild.quad_rgb_sensor.get_cyan_sta("middle", 1)
+estado_negro_interior = mbuild.quad_rgb_sensor.get_blue_sta("middle", 1) 
+estado_rojo_interior = mbuild.quad_rgb_sensor.get_purple_sta("middle", 1)
+estado_azul_interior = mbuild.quad_rgb_sensor.get_cyan_sta("middle", 1)
 estado_amarillo_interior = mbuild.quad_rgb_sensor.get_yellow_sta("middle", 1)
-estado_blanco_interior = mbuild.quad_rgb_sensor.get_white_sta("middle", 1)    
+estado_blanco_interior = mbuild.quad_rgb_sensor.get_white_sta("middle", 1)   
 
 
 cyberpi.console.clear()
@@ -32,86 +36,210 @@ def actualizar_qrgb():
     
     global fase_programa
     
-    # Declaracion global 4 sensores
-    global estado_negro_all, estado_verde_all, estado_rojo_all, estado_azul_all, estado_amarillo_all, estado_blanco_all, estado_cyan_all
-    # Declaracion global sensores interiores (r1, l2)
-    global estado_negro_interior, estado_verde_interior, estado_rojo_interior, estado_azul_interior, estado_amarillo_interior, estado_blanco_interior, estado_cyan_interior
-    
-    if fase_programa <= 1: # Actualizar estados utilizados en la fase 0 y 1
-        estado_negro_all = mbuild.quad_rgb_sensor.get_black_sta("all", 1)
-        estado_negro_interior = mbuild.quad_rgb_sensor.get_black_sta("middle", 1)
-        
-        estado_azul_all = mbuild.quad_rgb_sensor.get_blue_sta("all", 1)
-        estado_azul_interior = mbuild.quad_rgb_sensor.get_blue_sta("middle", 1)
-        estado_cyan_all = mbuild.quad_rgb_sensor.get_cyan_sta("all", 1)
-        estado_cyan_interior = mbuild.quad_rgb_sensor.get_cyan_sta("middle", 1) 
-        
-    if fase_programa == 2:
-        estado_azul_all = mbuild.quad_rgb_sensor.get_blue_sta("all", 1)
-        estado_azul_interior = mbuild.quad_rgb_sensor.get_blue_sta("middle", 1)
-        estado_cyan_all = mbuild.quad_rgb_sensor.get_cyan_sta("all", 1)
-        estado_cyan_interior = mbuild.quad_rgb_sensor.get_cyan_sta("middle", 1) 
+    # Declaracion variables globales de estado
+    global estado_negro_all, estado_rojo_all, estado_azul_all, estado_amarillo_all, estado_blanco_all
+    global estado_negro_interior, estado_rojo_interior, estado_azul_interior, estado_amarillo_interior, estado_blanco_interior
 
-
-def linea_negra():
+    if fase_programa == 0: # Actualizar estados utilizados en la fase 0 y 1
+        estado_negro_all = mbuild.quad_rgb_sensor.get_blue_sta("all", 1)
+        estado_negro_interior = mbuild.quad_rgb_sensor.get_blue_sta("middle", 1) 
+        
+        estado_azul_all = mbuild.quad_rgb_sensor.get_cyan_sta("all", 1)
+        estado_azul_interior = mbuild.quad_rgb_sensor.get_cyan_sta("middle", 1)
     
-    if (estado_negro_interior == 3): # Ambos sensores detectados
+    elif fase_programa == 1:
+        estado_azul_all = mbuild.quad_rgb_sensor.get_cyan_sta("all", 1)
+        estado_azul_interior = mbuild.quad_rgb_sensor.get_cyan_sta("middle", 1)
+        estado_amarillo_all = mbuild.quad_rgb_sensor.get_yellow_sta("all", 1)
+        estado_amarillo_interior = mbuild.quad_rgb_sensor.get_yellow_sta("middle", 1)
+    
+    elif fase_programa == 2:
+        estado_azul_all = mbuild.quad_rgb_sensor.get_cyan_sta("all", 1)
+        estado_azul_interior = mbuild.quad_rgb_sensor.get_cyan_sta("middle", 1)
+        estado_amarillo_all = mbuild.quad_rgb_sensor.get_yellow_sta("all", 1)
+        estado_amarillo_interior = mbuild.quad_rgb_sensor.get_yellow_sta("middle", 1)
+        estado_rojo_all = mbuild.quad_rgb_sensor.get_purple_sta("all", 1)
+        estado_rojo_interior = mbuild.quad_rgb_sensor.get_purple_sta("middle", 1)
+    
+    elif fase_programa == 3:
+        estado_amarillo_all = mbuild.quad_rgb_sensor.get_yellow_sta("all", 1)
+        estado_amarillo_interior = mbuild.quad_rgb_sensor.get_yellow_sta("middle", 1)
+    
+    elif fase_programa == 4:
+        estado_amarillo_all = mbuild.quad_rgb_sensor.get_yellow_sta("all", 1)
+        estado_amarillo_interior = mbuild.quad_rgb_sensor.get_yellow_sta("middle", 1)
+        estado_rojo_all = mbuild.quad_rgb_sensor.get_purple_sta("all", 1)
+        estado_rojo_interior = mbuild.quad_rgb_sensor.get_purple_sta("middle", 1)
+    
+    elif fase_programa == 5:
+        estado_rojo_all = mbuild.quad_rgb_sensor.get_purple_sta("all", 1)
+        estado_rojo_interior = mbuild.quad_rgb_sensor.get_purple_sta("middle", 1)
+    
+def sensor_fuego():
+    global fase_programa
+    if not mbot2.read_digital("S1"):  # Si detecta llama
+        mbot2.drive_speed(2, 0)
+        mbot2.motor_set(83, "M1")
+        if fase_programa == 1:
+            mbot2.turn(10)
+        time.sleep(3)
+        mbot2.motor_set(0, "M1")
+        if fase_programa == 5:
+            mbot2.drive_speed(0, 0)
+            mbot2.turn(-65)
+            fase_programa = 6
+            
+    elif fase_programa == 5: 
+        mbot2.drive_speed(0, 0)
+        mbot2.turn(-66) 
+        fase_programa = 6     
+
+def linea_negra(): # Seguir linea negra
+    
+    if estado_negro_interior == 3: # Ambos sensores detectados
         mbot2.drive_speed(vel - 10, -vel + 10) # Mover hacia adelante 
-        if estado_azul_all == 1:
-            mbot2.drive_speed(0,0)
                      
-    elif (estado_negro_interior == 1): # Sensor derecho detectado, izquierdo no detectado
+    elif estado_negro_interior == 1: # Sensor derecho detectado
         mbot2.drive_speed(vel - 5, 0) # Girar un poco a la derecha
                 
-    elif (estado_negro_interior == 2): # Sensor izquierdo detectado, derecho no detectado
+    elif estado_negro_interior == 2: # Sensor izquierdo detectado
         mbot2.drive_speed(0, -vel + 5) # Girar un poco a la izquierda
 
 
-def linea_azul(): # Girar y seguir la linea azul hasta no detectar mas azul
-    global fase_programa
+def linea_azul(): 
+    global fase_programa, estado_giro
     cyberpi.console.clear()
     cyberpi.console.println("Linea azul")
              
-    if estado_azul_interior != 3 or estado_cyan_interior != 3: # 3 = ambos sensores interiores detectados
-        mbot2.drive_speed(vel - 15, 0) # velocidad (5,0) - Girar a la derecha
-            
-    else:
-        if estado_azul_interior == 3 or estado_cyan_interior == 3:
+    if estado_azul_all == 3 or estado_azul_all == 1: # R1 y R2 detectado (Sensores utilizados para girar a la derecha)
+        mbot2.drive_speed(vel - 10, 0)
+    elif estado_azul_all == 6: # Seguir recto si esta arriba de la linea 0b0110
+        mbot2.drive_speed(vel, -vel)
+    elif estado_azul_all == 0b1110 or estado_azul_all == 0b1100: # Girar a la izquierda si se sale a la derecha
+        mbot2.drive_speed(0, -vel + 10)   
+    elif estado_azul_all == 0b0111 or estado_azul_all == 0b0011: # Girar a la derecha si se sale a la izquierda
+        mbot2.drive_speed(vel - 10, 0) 
+    elif estado_azul_all == 0b1111:
+        sensor_fuego()
+        fase_programa = 2
+
+def linea_azul_a_amarilla():
+    global fase_programa
+    cyberpi.console.clear()
+    cyberpi.console.println("Linea azul -> amarilla")
+    
+    if estado_azul_all == 6: # Seguir recto si esta arriba de la linea 0b0110
+        mbot2.drive_speed(vel - 10, -vel + 10)
+    elif estado_azul_all == 0b1110 or estado_azul_all == 0b1100: # Girar a la izquierda si se sale a la derecha
+        mbot2.drive_speed(0, -vel + 10)   
+    elif estado_azul_all == 0b0111 or estado_azul_all == 0b0011: # Girar a la derecha si se sale a la izquierda
+        mbot2.drive_speed(vel - 10, 0)        
+    elif estado_azul_all == 0b1111:
+        mbot2.drive_speed(vel - 10, 0)
+
+def linea_amarilla():
+    global fase_programa
+    cyberpi.console.clear()
+    cyberpi.console.println("Linea amarilla")
+    
+    if estado_amarillo_all == 6: # Seguir recto y girar un poco a la izquierda para alinearse si esta arriba de la linea 0b0110
+        mbot2.drive_speed(vel, -vel + 10)
+    elif estado_amarillo_all == 0b1110 or estado_amarillo_all == 0b1100 or estado_amarillo_all == 0b1000: # Girar a la izquierda si se sale a la derecha
+        mbot2.drive_speed(0, -vel + 10)   
+    elif estado_amarillo_all == 0b0111 or estado_amarillo_all == 0b0011 or estado_amarillo_all == 0b0001: # Girar a la derecha si se sale a la izquierda
+        mbot2.drive_speed(vel - 10, 0)        
+    elif estado_amarillo_all == 0b1111:
+        sensor_fuego()
+        fase_programa = 4
+
+def linea_amarilla_a_roja():
+    global fase_programa
+    cyberpi.console.clear()
+    cyberpi.console.println("Linea amarilla -> roja")
+    
+    if estado_amarillo_all == 6: # Seguir recto si esta arriba de la linea 0b0110
+        mbot2.drive_speed(vel - 5, -vel + 5)
+    elif estado_amarillo_all == 0b1110 or estado_amarillo_all == 0b1100 or estado_amarillo_all == 0b1000: # Girar a la izquierda si se sale a la derecha
+        mbot2.drive_speed(0, -vel + 5)   
+    elif estado_amarillo_all == 0b0111 or estado_amarillo_all == 0b0011 or estado_amarillo_all == 0b0001: # Girar a la derecha si se sale a la izquierda
+        mbot2.drive_speed(vel - 5, 0)        
+    elif estado_amarillo_all == 0b1111:
+        mbot2.drive_speed (vel - 5, 0)
+
+def linea_roja():
+    global fase_programa
+    cyberpi.console.clear()
+    cyberpi.console.println("Linea roja")
+    
+    if estado_rojo_all == 6: # Seguir recto y girar un poco a la izquierda para alinearse si esta arriba de la linea 0b0110
+        mbot2.drive_speed(vel, -vel + 10)
+    elif estado_rojo_all == 0b1110 or estado_rojo_all == 0b1100 or estado_rojo_all == 0b1000: # Girar a la izquierda si se sale a la derecha
+        mbot2.drive_speed(0, -vel + 10)   
+    elif estado_rojo_all == 0b0111 or estado_rojo_all == 0b0011 or estado_rojo_all == 0b0001: # Girar a la derecha si se sale a la izquierda
+        mbot2.drive_speed(vel - 10, 0)        
+    elif estado_rojo_all == 0b1111:
+        sensor_fuego()
+
+def vela_blanca():
+    global i_vb
+    cyberpi.console.clear()
+    cyberpi.console.println("Vela blanca")
+    
+    for i_vb in range(8000): # 8 segundos
+        if not mbot2.read_digital("S1"):  # Si detecta llama
+            mbot2.drive_speed(2, 0)
+            mbot2.motor_set(85, "M1")
+            time.sleep(5)
+            mbot2.motor_set(0, "M1")
+        elif mbot2.read_digital("S1"): # Si no detecta llama
             mbot2.drive_speed(vel, -vel)
-        elif estado_azul_interior == 1 or estado_cyan_interior == 1: # Sensor derecho detectado, izquierdo no detectado
-            mbot2.drive_speed(vel - 5, 0) # Girar un poco a la derecha  
-        elif estado_azul_interior == 2 or estado_cyan_interior == 2: # Sensor izquierdo detectado, derecho no detectado
-            mbot2.drive_speed(0, -vel + 5) # Girar un poco a la izquierda
-        elif estado_azul_interior == 0 and estado_cyan_interior == 0:
-            fase_programa = 2
+        time.sleep(0.001)
         
-        
-            
+
 def seguir_linea():
     global fase_programa
+    global estado_negro_all, estado_rojo_all, estado_azul_all, estado_amarillo_all, estado_blanco_all
+    global estado_negro_interior, estado_rojo_interior, estado_azul_interior, estado_amarillo_interior, estado_blanco_interior
     cyberpi.console.clear() 
     
     while True:
         actualizar_qrgb()
     
         if fase_programa == 0: # Fase 0: Seguir linea negra hasta llegar a la azul
-        
-            if (estado_azul_all == 3 or estado_azul_all == 1) or (estado_cyan_all == 3 or estado_cyan_all == 1): # Si sensor R1 o R2 y R1 detectado, siguiente fase
+            if estado_azul_all > 0:
                 fase_programa = 1
-                mbot2.drive_speed(0,0) # Parar y pasar a la proxima fase
+                mbot2.drive_speed(0,0) 
             else:
                 linea_negra()
-                
                         
-        elif fase_programa == 1: # Girar y seguir linea azul hasta no detectar mas azul
-             linea_azul()
+        elif fase_programa == 1: # Fase 1: Bucle linea azul
+            linea_azul()
         
-        elif fase_programa == 2:
-            mbot2.drive_speed(0, 0)
-    
-
+        elif fase_programa == 2: # Fase 2: Llegar hasta linea amarilla
+            if estado_amarillo_all > 0:
+                mbot2.drive_speed(vel - 10, 0)
+                fase_programa = 3
+            else:
+                linea_azul_a_amarilla()
+                
+        elif fase_programa == 3: # Fase 3: Bucle linea amarilla
+            linea_amarilla()
+        
+        elif fase_programa == 4: # Fase 4: Llegar hasta linea roja
+            if estado_rojo_all > 0:
+                fase_programa = 5
+                mbot2.drive_speed(vel - 10, 0)
+            else:
+                linea_amarilla_a_roja()
+        
+        elif fase_programa == 5: # Fase 5: Bucle linea roja
+            linea_roja()
+            
+        elif fase_programa == 6:
+            vela_blanca()
+        
+        
 
 @event.start
 def on_start():
     seguir_linea()
-    
