@@ -14,7 +14,7 @@ Para realizar esta tarea, hemos necesitado los siguientes sensores y actuadores 
 -1 motor de rotación continua, externo
 
 FASE 1
-Para la primera fase, se decidió crear dos variables: una para cuando el mbot2 detectara una línea negra (detectada como azul, debido a su calibración sobre el fondo para solucionar una de las limitaciones de la tercera prueba), y otra para cuando el mbot2 detectara una línea negra (detectada como cyan, por la misma razón). El robot se dirige por el lado izquierdo de las "plantaciones", representados mediante las líneas verdes. Para ello, utilizamos (-), lo que nos permitió controlar la dirección en la que se mueve el robot.
+Para la primera fase, se decidió crear dos variables: una para cuando el mbot2 detectara una línea negra (detectada como azul, debido a su calibración sobre el fondo para solucionar una de las limitaciones de la tercera prueba), y otra para cuando el mbot2 detectara una línea azul (detectada como cyan, por la misma razón). El robot se dirige por el lado izquierdo de las "plantaciones", representados mediante las líneas verdes. Para ello, utilizamos (-), lo que nos permitió controlar la dirección en la que se mueve el robot.
 
 FASE 2
 En la segunda fase, utilizamos el sensor qRGB para seguir la línea y también el sensor infrarrojo para saber dónde está la alpaca de paja.
