@@ -4,9 +4,13 @@ Este es el repositorio público para la olimpiada de robótica de la división d
 Para realizar esta tarea, hemos necesitado los siguientes sensores y actuadores (también incluidos en el documento "Memoria Técnica").
 
 -1 sensor qRGB, incluido con el kit de mBot2
+
 -1 sensor infrarrojo, incluido con el kit de mBot2
+
 -1 sensor de llama (utilizado en la tercera fase), externo
+
 -2 motores de rotación continua, para las ruedas, incluidos con el kit de mBot2
+
 -1 motor de rotación continua, externo
 
 FASE 1
