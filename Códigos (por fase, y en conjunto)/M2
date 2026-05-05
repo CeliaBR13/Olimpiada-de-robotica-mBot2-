@@ -1,1 +1,245 @@
+import event, cyberpi, mbuild, mbot2, time
 
+# --- VARIABLES GLOBALES ---
+vel = 10
+fase_programa = 0
+
+# Estados de sensores para todos los colores
+estado_azul_all = 0
+estado_azul_interior = 0
+estado_morado_all = 0
+estado_morado_interior = 0
+estado_cian_all = 0
+estado_cian_interior = 0
+estado_verde_all = 0
+estado_verde_interior = 0
+estado_amarillo_all = 0
+estado_amarillo_interior = 0
+
+# --- FUNCIONES DE ACTUALIZACIÓN DE SENSORES ---
+
+def actualizar_qrgb_azul():
+    global estado_azul_all, estado_azul_interior
+    estado_azul_all = mbuild.quad_rgb_sensor.get_blue_sta("all", 1)
+    estado_azul_interior = mbuild.quad_rgb_sensor.get_blue_sta("middle", 1)
+
+def actualizar_qrgb_morado():
+    global estado_morado_all, estado_morado_interior
+    estado_morado_all = mbuild.quad_rgb_sensor.get_purple_sta("all", 1)
+    estado_morado_interior = mbuild.quad_rgb_sensor.get_purple_sta("middle", 1)
+
+def actualizar_qrgb_cian():
+    global estado_cian_all, estado_cian_interior
+    estado_cian_all = mbuild.quad_rgb_sensor.get_cyan_sta("all", 1)
+    estado_cian_interior = mbuild.quad_rgb_sensor.get_cyan_sta("middle", 1)
+
+def actualizar_qrgb_verde():
+    global estado_verde_all, estado_verde_interior
+    estado_verde_all = mbuild.quad_rgb_sensor.get_green_sta("all", 1)
+    estado_verde_interior = mbuild.quad_rgb_sensor.get_green_sta("middle", 1)
+
+def actualizar_qrgb_amarillo():
+    global estado_amarillo_all, estado_amarillo_interior
+    estado_amarillo_all = mbuild.quad_rgb_sensor.get_yellow_sta("all", 1)
+    estado_amarillo_interior = mbuild.quad_rgb_sensor.get_yellow_sta("middle", 1)
+
+# --- FUNCIONES DE SEGUIMIENTO ---
+
+def seguir_azul():
+    actualizar_qrgb_azul()
+    if estado_azul_interior == 3:
+        mbot2.drive_speed(vel, -vel)
+    elif estado_azul_interior == 1:
+        mbot2.drive_speed(vel, 0)
+    elif estado_azul_interior == 2:
+        mbot2.drive_speed(0, -vel)
+    elif (mbuild.quad_rgb_sensor.is_color("blue","R2",1)):
+        mbot2.drive_speed(vel, 0)
+    elif (mbuild.quad_rgb_sensor.is_color("blue","L2",1)):
+        mbot2.drive_speed(0, -vel)
+    else:
+        mbot2.drive_speed(vel, 0)
+    
+
+def seguir_morado():
+    actualizar_qrgb_morado()
+    if estado_morado_interior == 3:
+        mbot2.drive_speed(vel, -vel)
+    elif estado_morado_interior == 1:
+        mbot2.drive_speed(vel, 0)
+    elif estado_morado_interior == 2:
+        mbot2.drive_speed(0, -vel)
+    elif (mbuild.quad_rgb_sensor.is_color("purple","R2",1)):
+        mbot2.drive_speed(vel, 0)
+    elif (mbuild.quad_rgb_sensor.is_color("purple","L2",1)):
+        mbot2.drive_speed(0, -vel)
+    else:
+        mbot2.drive_speed(0, -vel)
+
+def seguir_verde():
+    actualizar_qrgb_verde()
+    if estado_verde_interior == 3:
+        mbot2.drive_speed(vel, -vel)
+    elif estado_verde_interior == 1:
+        mbot2.drive_speed(vel, 0)
+    elif estado_verde_interior == 2:
+        mbot2.drive_speed(0, -vel)
+    elif (mbuild.quad_rgb_sensor.is_color("green","R2",1)):
+        mbot2.drive_speed(vel, 0)
+    elif (mbuild.quad_rgb_sensor.is_color("green","L2",1)):
+        mbot2.drive_speed(0, -vel)
+    else:
+        mbot2.drive_speed(0, -vel)
+
+def seguir_cian():
+    actualizar_qrgb_cian()
+    if estado_cian_interior == 3:
+        mbot2.drive_speed(vel, -vel)
+    elif estado_cian_interior == 1:
+        mbot2.drive_speed(vel, 0)
+    elif estado_cian_interior == 2:
+        mbot2.drive_speed(0, -vel)
+    elif (mbuild.quad_rgb_sensor.is_color("cyan","R2",1)):
+        mbot2.drive_speed(vel, 0)
+    elif (mbuild.quad_rgb_sensor.is_color("cyan","L2",1)):
+        mbot2.drive_speed(0, -vel)
+    else:
+        mbot2.drive_speed(0, -vel)
+
+def seguir_amarillo():
+    actualizar_qrgb_amarillo()
+    if estado_amarillo_interior == 3:
+        mbot2.drive_speed(vel, -vel)
+    elif estado_amarillo_interior == 1:
+        mbot2.drive_speed(vel, 0)
+    elif estado_amarillo_interior == 2:
+        mbot2.drive_speed(0, -vel)
+    elif (mbuild.quad_rgb_sensor.is_color("yellow","R2",1)):
+        mbot2.drive_speed(vel, 0)
+    elif (mbuild.quad_rgb_sensor.is_color("yellow","L2",1)):
+        mbot2.drive_speed(0, -vel)
+    else:
+        mbot2.drive_speed(0, -vel)
+
+def maniobra_maquina(nombre):
+    cyberpi.console.println("Maniobra " + nombre)
+    mbot2.drive_speed(vel,-vel)
+    time.sleep(1.67)
+    mbot2.EM_stop("ALL")
+    mbot2.turn(-90)
+    time.sleep(0.5)
+    mbot2.drive_speed(vel, -vel)
+    time.sleep(1)
+    mbot2.drive_speed(-vel, vel)
+    time.sleep(1)
+    mbot2.turn(-90)
+    mbot2.drive_speed(0, 0)
+
+# --- EVENTOS ---
+
+@event.is_press('a')
+def on_press_a():
+    cyberpi.console.clear()
+    cyberpi.console.println("Calibrando...")
+    mbuild.quad_rgb_sensor.adjust(1)
+    cyberpi.console.println("Calibracion OK")
+
+@event.is_press('b')
+def on_press_b():
+    global fase_programa
+    fase_programa = 1
+    cyberpi.console.clear()
+    
+    while True:
+        # --- BLOQUE MORADO ---
+        if fase_programa == 1: # Seguir Azul hasta Morado (L2 o R2)
+            seguir_azul()
+            if mbuild.quad_rgb_sensor.is_color("purple", "L2", 1) or mbuild.quad_rgb_sensor.is_color("purple", "R2", 1):
+                mbot2.drive_speed(0,-3*vel)
+                time.sleep(0.98)
+                fase_programa = 1.1
+        elif fase_programa == 1.1: # Seguir Morado hasta Azul Perpendicular (L2 y R2)
+            seguir_morado()
+            if mbuild.quad_rgb_sensor.is_color("blue", "L2", 1) and mbuild.quad_rgb_sensor.is_color("blue", "R2", 1):
+                mbot2.drive_speed(vel,0)
+                time.sleep(0.98)
+                fase_programa = 1.2
+        elif fase_programa == 1.2: # Seguir Azul hasta Morado (L2 o R2) -> MANIOBRA
+            seguir_azul()
+            if mbuild.quad_rgb_sensor.is_color("purple", "L2", 1) or mbuild.quad_rgb_sensor.is_color("purple", "R2", 1):
+                maniobra_maquina("Roja")
+                fase_programa = 2
+
+        # --- BLOQUE VERDE ---
+        elif fase_programa == 2: # Seguir Azul hasta Verde
+            seguir_azul()
+            if mbuild.quad_rgb_sensor.is_color("green", "L2", 1) or mbuild.quad_rgb_sensor.is_color("green", "R2", 1):
+                mbot2.drive_speed(0,-vel)
+                time.sleep(0.98)
+                fase_programa = 2.1
+        elif fase_programa == 2.1: # Seguir Verde hasta Azul Perpendicular
+            seguir_verde()
+            if mbuild.quad_rgb_sensor.is_color("blue", "L2", 1) and mbuild.quad_rgb_sensor.is_color("blue", "R2", 1):
+                mbot2.drive_speed(vel, 0)
+                time.sleep(0.98)
+                fase_programa = 2.2
+        elif fase_programa == 2.2: # Seguir Azul hasta Verde -> MANIOBRA
+            seguir_azul()
+            if mbuild.quad_rgb_sensor.get_blue_sta("all", 1) == 7:
+                mbot2.drive_speed(vel, 0)
+                time.sleep(2)
+            if mbuild.quad_rgb_sensor.is_color("green", "L2", 1):
+                maniobra_maquina("Verde")
+                fase_programa = 3
+
+        # --- BLOQUE CIAN ---
+        elif fase_programa == 3: # Seguir Azul hasta Cian
+            seguir_azul()
+            if mbuild.quad_rgb_sensor.is_color("cyan", "L2", 1) or mbuild.quad_rgb_sensor.is_color("cyan", "R2", 1):
+                fase_programa = 3.1
+        elif fase_programa == 3.1: # Seguir Cian hasta Azul Perpendicular
+            seguir_cian()
+            if mbuild.quad_rgb_sensor.is_color("blue", "L2", 1) and mbuild.quad_rgb_sensor.is_color("blue", "R2", 1):
+                mbot2.drive_speed(0, -vel)
+                time.sleep(1.75)
+                fase_programa = 3.2
+        elif fase_programa == 3.2: # Seguir Azul hasta Cian -> MANIOBRA
+            seguir_azul()
+            if mbuild.quad_rgb_sensor.get_blue_sta("all", 1) == 7:
+                mbot2.drive_speed(0, -vel)
+                time.sleep(2)
+            if mbuild.quad_rgb_sensor.is_color("cyan", "L2", 1):
+                maniobra_maquina("Cian")
+                fase_programa = 4
+
+        # --- BLOQUE AMARILLO ---
+        elif fase_programa == 4: # Seguir Azul hasta Amarillo
+            seguir_azul()
+            if mbuild.quad_rgb_sensor.is_color("yellow", "L2", 1) or mbuild.quad_rgb_sensor.is_color("yellow", "R2", 1):
+                fase_programa = 4.1
+        elif fase_programa == 4.1: # Seguir Amarillo hasta Azul Perpendicular
+            mbot2.drive_speed(vel,-vel)
+            time.sleep(1.67)
+            mbot2.EM_stop("ALL")
+            mbot2.turn(90)
+            mbot2.drive_speed (vel,-vel)
+            time.sleep(1.5)
+            for count in range(10):
+                mbot2.turn(-18)
+                time.sleep(0.5)
+            mbot2.drive_speed (vel, -vel)
+            if mbuild.quad_rgb_sensor.is_color("blue", "L2", 1) and mbuild.quad_rgb_sensor.is_color("blue", "R2", 1):
+                fase_programa = 4.2
+        elif fase_programa == 4.2: # Seguir Azul hasta Amarillo -> MANIOBRA
+            seguir_azul()
+            if mbuild.quad_rgb_sensor.is_color("yellow", "L2", 1) or mbuild.quad_rgb_sensor.is_color("yellow", "R2", 1):
+                maniobra_maquina("Amarilla")
+                cyberpi.console.println("Fin")
+                break
+
+        time.sleep(0.01)
+
+@event.start
+def on_start():
+    cyberpi.console.clear()
+    cyberpi.console.println("A: Calibrar | B: Iniciar")
