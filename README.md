@@ -15,8 +15,10 @@ Para realizar esta tarea, hemos necesitado los siguientes sensores y actuadores 
 
 FASE 1
 Para la primera fase, se decidió crear dos variables: una para cuando el mbot2 detectara una línea negra (detectada como azul, debido a su calibración sobre el fondo para solucionar una de las limitaciones de la tercera prueba), y otra para cuando el mbot2 detectara una línea negra (detectada como cyan, por la misma razón). El robot se dirige por el lado izquierdo de las "plantaciones", representados mediante las líneas verdes. Para ello, utilizamos (-), lo que nos permitió controlar la dirección en la que se mueve el robot.
+
 FASE 2
 Para la segunda fase tuvimos que utilizar, además del sensor qRGB para seguir la línea, el sensor infrarrojo, para detectar dónde está la alpaca de paja. (-)
+
 FASE 3
 Para la última fase también tuvimos que utilizar el sensor qRGB, y tuvimos que incluir un sensor de llamas para detectar el incendio, y un motor de rotación continua para apagarlo. Primero, después de seguir la línea negra y cambiar a seguir la línea azul, pasa a detectar si la vela está encendida. Si estuviera encendida, la apaga y continúa hacia la línea amarilla, y si está apagada, pasa directamente a la línea amarilla. Con la transición de amarillo-rojo pasa igual, pero, al finalizar el recorrido, realiza un giro de 292º, y se dirige hacia donde está la vela en la circunferencia blanca. Aquí nos guiamos únicamente por la luz de la vela, debido a que, como realizamos la calibración sobre el fondo (si se calibraba sobre un fondo blanco, el fondo de la lona lo detectaba como rojo, por lo que al llegar al cambio de amarillo-rojo se perdía).
 
