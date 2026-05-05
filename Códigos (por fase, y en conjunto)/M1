@@ -31,11 +31,11 @@ def on_start():
             deb = 0
             sitio = "NEGRO"
             if doi == 1:
-                time.sleep(1)
+                time.sleep(2)
                 mbot2.drive_speed(-vel, -vel)
                 time.sleep(5)
             elif doi == -1:
-                time.sleep(1)
+                time.sleep(2)
                 mbot2.drive_speed(vel, vel)
                 time.sleep(5)
             mbot2.drive_speed(0, 0)
