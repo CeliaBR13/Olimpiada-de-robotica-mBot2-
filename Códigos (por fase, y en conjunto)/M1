@@ -1,41 +1,42 @@
-import event, cyberpi, mbuild, mbot2, time
+import event, cyberpi, mbuild, mbot2, time #librerias
 
-
+#Variables para calibrar
 base_power = 0
 kp = 0
 left_power = 0
 right_power = 0
 
-
+#loop principal
 @event.start
 def on_start():
     global base_power, kp, left_power, right_power
-    vel = 5
-    deb = 1
-    sitio = "NEGRO"
-    doi = -1 
+    vel = 5 #velocidad base del robot
+    deb = 1 # debounce, para evitar que el robot detecte lo mismo muchas veces de una
+    sitio = "NEGRO" #ubicacion del robot
+    doi = -1 #variable que indica si debe girar a la izquierda o la la derecha
  
-    cyberpi.audio.set_vol(100)
     cyberpi.console.clear()
 
     while True:
-        estado = mbuild.quad_rgb_sensor.get_green_sta("all", 1)
-        estadon = mbuild.quad_rgb_sensor.get_blue_sta("all", 1)
+        estado = mbuild.quad_rgb_sensor.get_green_sta("all", 1) #codigo que devuelve a la variable la deteccion verde
+        estadon = mbuild.quad_rgb_sensor.get_blue_sta("all", 1) #codigo que devuelve a la variable la deteccion negra
  
-        cyberpi.console.clear()
+        cyberpi.console.clear() #muestra datos esenciales para debug en la pantalla
         cyberpi.console.println(bin(estado))
         cyberpi.console.println(bin(estadon))
         cyberpi.console.println(sitio)
         cyberpi.console.println(doi)
-
-        if sitio == "VERDE" and (1 <= estadon <= 15) and deb == 1:
+        #detectar cambio de sitio
+        if sitio == "VERDE" and (1 <= estadon <= 15) and deb == 1: 
             deb = 0
             sitio = "NEGRO"
             if doi == 1:
-                mbot2.drive_speed(0, 2*-vel)
+                time.sleep(1)
+                mbot2.drive_speed(-vel, -vel)
                 time.sleep(5)
             elif doi == -1:
-                mbot2.drive_speed(2*vel, 0)
+                time.sleep(1)
+                mbot2.drive_speed(vel, vel)
                 time.sleep(5)
             mbot2.drive_speed(0, 0)
             time.sleep(1)
@@ -45,25 +46,37 @@ def on_start():
             deb = 0
             sitio = "VERDE"
             if doi == 1:
-                mbot2.drive_speed(0, 2*-vel)
+                time.sleep(0.5)
+                mbot2.drive_speed(-vel, -vel)
                 time.sleep(5)
             elif doi == -1:
-                mbot2.drive_speed(2*vel, 0)
-                time.sleep(5)  
-            doi = -doi            
-            mbot2.drive_speed(0, 0)      
+                time.sleep(0.5)
+                mbot2.drive_speed(vel, vel)
+                time.sleep(5)
+            doi = -doi
+            mbot2.drive_speed(0, 0)
             time.sleep(1)
             deb = 1
-
+        #movimiento segun el sitio en el que esta
         if sitio == "VERDE":
-            if estado in [8, 12]:
-                mbot2.drive_speed(vel, -vel)
-            elif estado in [0, 15]:
-                mbot2.drive_speed(0, -vel)
-            elif estado in [14, 1, 2, 3, 4, 5, 6, 7]:
-                mbot2.drive_speed(vel, 0)
-            elif estado in [9, 10, 11, 13]:
-                mbot2.drive_speed(0, 0)
+            if doi == -1:
+                if estado in [1, 5, 9, 10, 11, 13, 15]:
+                    mbot2.drive_speed(vel, -vel)
+                elif estado in [2, 3, 4, 6, 7, 8, 12, 14]:
+                    mbot2.drive_speed(0, -vel)
+                elif estado in [0]:
+                    mbot2.drive_speed(vel, 0)
+                #elif estado in []:
+                    #mbot2.drive_speed(0, 0)
+            elif doi == 1: # como debe moverse segun la linea
+                if estado in [8]:
+                    mbot2.drive_speed(vel, -vel)
+                elif estado in [0, 15]:
+                    mbot2.drive_speed(0, -vel)
+                elif estado in [14, 1, 2, 3, 4, 5, 6, 7, 12]:
+                    mbot2.drive_speed(vel, 0)
+                elif estado in [9, 10, 11, 13]:
+                    mbot2.drive_speed(0, 0)
 
         elif sitio == "NEGRO":
             if doi == 1:
@@ -76,7 +89,7 @@ def on_start():
                 elif estadon == 5:
                     mbot2.drive_speed(0, 0)
  
-            elif doi == -1:
+            elif doi == -1: # como debe moverse segun si debe girar a la derecha o la izquierda
                 if estadon in [4, 8, 12]:
                     mbot2.drive_speed(vel, -vel)
                 elif estadon in [1, 2, 3, 6, 14, 15]:
@@ -86,9 +99,9 @@ def on_start():
                 elif estadon == 5:
                     mbot2.drive_speed(0, 0)
 
-        time.sleep(0.02)
+        time.sleep(0.02) # pequeño wait
 
-@event.is_press('a')
+@event.is_press('a') #calibrar
 def is_btn_press1():
     global base_power, kp, left_power, right_power
     mbuild.quad_rgb_sensor.adjust(1)
