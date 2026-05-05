@@ -1,0 +1,94 @@
+import event, cyberpi, mbuild, mbot2, time
+
+
+base_power = 0
+kp = 0
+left_power = 0
+right_power = 0
+
+
+@event.start
+def on_start():
+    global base_power, kp, left_power, right_power
+    vel = 5
+    deb = 1
+    sitio = "NEGRO"
+    doi = -1 
+ 
+    cyberpi.audio.set_vol(100)
+    cyberpi.console.clear()
+
+    while True:
+        estado = mbuild.quad_rgb_sensor.get_green_sta("all", 1)
+        estadon = mbuild.quad_rgb_sensor.get_blue_sta("all", 1)
+ 
+        cyberpi.console.clear()
+        cyberpi.console.println(bin(estado))
+        cyberpi.console.println(bin(estadon))
+        cyberpi.console.println(sitio)
+        cyberpi.console.println(doi)
+
+        if sitio == "VERDE" and (1 <= estadon <= 15) and deb == 1:
+            deb = 0
+            sitio = "NEGRO"
+            if doi == 1:
+                mbot2.drive_speed(0, 2*-vel)
+                time.sleep(5)
+            elif doi == -1:
+                mbot2.drive_speed(2*vel, 0)
+                time.sleep(5)
+            mbot2.drive_speed(0, 0)
+            time.sleep(1)
+            deb = 1
+
+        elif sitio == "NEGRO" and (1 <= estado <= 15) and deb == 1:
+            deb = 0
+            sitio = "VERDE"
+            if doi == 1:
+                mbot2.drive_speed(0, 2*-vel)
+                time.sleep(5)
+            elif doi == -1:
+                mbot2.drive_speed(2*vel, 0)
+                time.sleep(5)  
+            doi = -doi            
+            mbot2.drive_speed(0, 0)      
+            time.sleep(1)
+            deb = 1
+
+        if sitio == "VERDE":
+            if estado in [8, 12]:
+                mbot2.drive_speed(vel, -vel)
+            elif estado in [0, 15]:
+                mbot2.drive_speed(0, -vel)
+            elif estado in [14, 1, 2, 3, 4, 5, 6, 7]:
+                mbot2.drive_speed(vel, 0)
+            elif estado in [9, 10, 11, 13]:
+                mbot2.drive_speed(0, 0)
+
+        elif sitio == "NEGRO":
+            if doi == 1:
+                if estadon in [1, 3]:
+                    mbot2.drive_speed(vel, -vel)
+                elif estadon in [2, 4, 6, 7, 8, 12, 14, 15]:
+                    mbot2.drive_speed(0, -vel)
+                elif estadon == 0:
+                    mbot2.drive_speed(vel, 0)
+                elif estadon == 5:
+                    mbot2.drive_speed(0, 0)
+ 
+            elif doi == -1:
+                if estadon in [4, 8, 12]:
+                    mbot2.drive_speed(vel, -vel)
+                elif estadon in [1, 2, 3, 6, 14, 15]:
+                    mbot2.drive_speed(vel, 0)
+                elif estadon == 0:
+                    mbot2.drive_speed(0, -vel)
+                elif estadon == 5:
+                    mbot2.drive_speed(0, 0)
+
+        time.sleep(0.02)
+
+@event.is_press('a')
+def is_btn_press1():
+    global base_power, kp, left_power, right_power
+    mbuild.quad_rgb_sensor.adjust(1)
