@@ -33,3 +33,13 @@ Como módulos, utilizamos:
 -mbuild, para poder controlar los sensores que vienen con el kit de mBot2 y los externos
 
 -mbot2, para poder controlar los motores que vienen con el kit de mBot2 (utilizados a la vez, y controlados mediante mbot2.drive.speed) y los externos (interpretados en el código como "M1", sólo utilizado en la tercera fase)
+
+PROBLEMAS DETECTADOS A LO LARGO DE LAS FASES
+
+-Error en la calibración: De vez en cuando, el robot no detectaba los colores correctamente. SOLUCIÓN: Volver a calibrar el mBot2, con el programa de ejemplo de "Color Line Follow".
+
+-Error en la detección del color correcto del fondo: Si se calibraba el mBot2 sobre un fondo blanco, el fondo lo detectaba de color rojo. Esto no suponía ningún problema en la fase 1, pero al llegar a las fases 2 y 3 y tenía que seguir una línea blanca, se perdía. SOLUCIÓN: Calibrar el mBot2 sobre el fondo, así no tiene ningún problema a la hora de detectar la línea roja.
+
+-Error a la hora de recoger las alpacas de paja de la fase 2: Al tratar de recoger las alpacas de paja en la fase 2, los brazos que fueron impresos las empujaban, en vez de recogerlas. SOLUCIÓN: Cortar parte de los brazos (aprox. 5 cm), para que no molestaran a la hora de girar.
+
+-Error en el funcionamiento del ventilador: Al finalizar el código de la tercera prueba, el ventilador no se encendía, debido a un cortocircuito. SOLUCIÓN: Volver a montar el ventilador, arreglando los cables mal conectados.
