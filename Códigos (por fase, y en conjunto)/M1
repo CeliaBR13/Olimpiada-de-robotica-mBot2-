@@ -66,8 +66,6 @@ def on_start():
                     mbot2.drive_speed(0, -vel)
                 elif estado in [0]:
                     mbot2.drive_speed(vel, 0)
-                #elif estado in []:
-                    #mbot2.drive_speed(0, 0)
             elif doi == 1: # como debe moverse segun la linea
                 if estado in [8]:
                     mbot2.drive_speed(vel, -vel)
